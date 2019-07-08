@@ -1,0 +1,11 @@
+{
+  "database": {
+    "client": "mysql",
+    "host": "localhost",
+    "user": "root",
+    "password": "supersecret",
+    "database": "bookshelf",
+    "timezone": "UTC",
+    "connectionLimit": 100
+  }
+}
