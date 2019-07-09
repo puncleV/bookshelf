@@ -73,11 +73,12 @@ export class BaseRepository<T extends {id: string}, Q> {
     return this.getInternalEntityFromRaw(_.get(rawData, "[0][0]", null) as Q) as T;
   }
 
-  public async findMany(entity: Partial<T>): Promise<T[]> {
+  public async findMany(entity: Partial<T>, query: types.Omit<sql.IQuery, "where">): Promise<T[]> {
     const rawData = await this.sqlConnection.connection.raw(
       this.selectBuilder.build({
         tableName: this.entity,
         query: {
+          ...query,
           where: this.getRawEntityFromInternal(entity),
         },
       }),
