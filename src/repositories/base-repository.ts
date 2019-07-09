@@ -88,9 +88,13 @@ export class BaseRepository<T extends {id: string}, Q> {
 
   public async update(id: string, entity: Partial<types.Omit<T, "id">>) {
     await this.sqlConnection
-      .connection(this.entity)
-      .where({id})
-      .update(this.getRawEntityFromInternal(entity as T));
+      .connection.raw(this.updateBuilder.build({
+        tableName: this.entity,
+        fields: this.getRawEntityFromInternal(entity as T),
+        query: {
+          where: {id}
+        }
+      }));
 
     return this.findById(id);
   }
