@@ -1,7 +1,6 @@
 import * as repositories from "../../repositories";
 
-export interface IBookSearchRequest {
-    fields?: Partial<repositories.IBook>;
+export interface IBookSearchRequest extends Partial<repositories.IBook>{
     order?: string,
     skip?: number,
     limit?: number,

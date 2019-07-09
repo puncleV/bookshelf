@@ -11,6 +11,7 @@ export const container = createContainer().register({
   BookController: asClass(controllers.BookController),
 
   bookCreator: asClass(services.BookCreator),
+  bookSearcher: asClass(services.BookSearcher),
 
   bookRepository: asClass(repositories.BookRepository),
 

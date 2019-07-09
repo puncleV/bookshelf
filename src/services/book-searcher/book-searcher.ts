@@ -14,10 +14,12 @@ export class BookSearcher {
   }
 
   public async find(bookCreateRequest: IBookSearchRequest): Promise<IBookSearchResult> {
-    const books = await this.bookRepository.findMany(bookCreateRequest.fields || {}, {
-      limit: bookCreateRequest.limit,
-      skip: bookCreateRequest.skip,
-      ...this.parseOrder(bookCreateRequest.order)
+    const {order, skip, limit, ...fields} = bookCreateRequest;
+
+    const books = await this.bookRepository.findMany(fields || {}, {
+      limit: limit,
+      skip: skip,
+      ...this.parseOrder(order)
     });
 
     return books;

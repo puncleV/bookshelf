@@ -12,3 +12,10 @@ export const BOOK_CREATE_VALIDATOR = joi.object({
   description: joi.string(),
   image: joi.string().uuid(),
 });
+
+export const BOOK_SEARCH_VALIDATOR = joi.object({
+  fields: BOOK_CREATE_VALIDATOR,
+  order: joi.string(),
+  skip: joi.number(),
+  limit: joi.number(),
+});

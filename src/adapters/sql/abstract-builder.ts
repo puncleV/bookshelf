@@ -1,3 +1,4 @@
+import _ from "lodash";
 import SqlString from "sqlstring";
 import {IBuilder, IQueryParams, IWhere} from "./types";
 
@@ -13,7 +14,7 @@ export abstract class AbstractBuilder implements IBuilder {
   }
 
   protected where(where?: IWhere) {
-    if (where == null) {
+    if (where == null || _.isEmpty(where)) {
       return "";
     }
 
@@ -53,11 +54,11 @@ export abstract class AbstractBuilder implements IBuilder {
     );
   }
 
-  protected escapeValue (value: string | number | Record<string, any>): string {
+  protected escapeValue(value: string | number | Record<string, any>): string {
     return SqlString.escape(value);
   }
 
-  protected escapeId (value: string | string[]): string {
+  protected escapeId(value: string | string[]): string {
     return SqlString.escapeId(value);
   }
 }
