@@ -17,6 +17,7 @@ export abstract class AbstractBuilder implements IBuilder {
       return "";
     }
 
+    // todo make more readable
     return (
       Object.entries(where).reduce((acc, [key, value]) => {
         if (acc !== "WHERE ") {
@@ -30,16 +31,17 @@ export abstract class AbstractBuilder implements IBuilder {
           value: any;
         }> = [];
 
+        const escapedKey = this.escapeId(key);
         if (Array.isArray(value)) {
           keyValues.push(
             ...value.map((fieldValue) => ({
-              key: this.escapeId(key),
+              key: escapedKey,
               value: this.escapeValue(fieldValue),
             })),
           );
         } else {
           keyValues.push({
-            key: this.escapeId(key),
+            key: escapedKey,
             value: this.escapeValue(value),
           });
         }
@@ -51,7 +53,7 @@ export abstract class AbstractBuilder implements IBuilder {
     );
   }
 
-  protected escapeValue (value: string | number): string {
+  protected escapeValue (value: string | number | Record<string, any>): string {
     return SqlString.escape(value);
   }
 
