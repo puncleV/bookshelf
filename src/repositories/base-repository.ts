@@ -33,7 +33,7 @@ export class BaseRepository<T extends {id: string}, Q> {
     this.selectBuilder = dependencies.selectBuilder;
     this.insertBuilder = dependencies.insertBuilder;
     this.updateBuilder = dependencies.updateBuilder;
-    this.deleteBuilder = dependencies.selectBuilder;
+    this.deleteBuilder = dependencies.deleteBuilder;
 
     this.entity = params.entity;
     this.mapToRawFields = params.mapToRawFields;
@@ -104,17 +104,17 @@ export class BaseRepository<T extends {id: string}, Q> {
   }
 
   public async deleteById(id: string): Promise<void> {
-    return await this.sqlConnection
-      .connection(this.entity)
-      .where({id})
-      .del();
+    return this.delete({id} as T);
   }
 
   public async delete(entity: Partial<T>): Promise<void> {
-    return await this.sqlConnection
-      .connection(this.entity)
-      .where(this.getRawEntityFromInternal(entity))
-      .del();
+    return this.sqlConnection
+      .connection.raw(this.deleteBuilder.build({
+        tableName: this.entity,
+        query: {
+          where: this.getRawEntityFromInternal(entity)
+        }
+      }))
   }
 
   // todo this is not the best place for this generic method

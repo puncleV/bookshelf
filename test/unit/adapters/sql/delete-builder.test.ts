@@ -24,7 +24,7 @@ describe("DeleteBuilder", () => {
       });
 
       expect(sql).to.be.eql(
-        "DELETE * FROM `table` WHERE (`@|\\  \\ '` = 'WHERE\\' DELETE') AND (`column` = '\\' some serious injection /  \\'' OR `column` = 'lol' ) ",
+        "DELETE FROM `table` WHERE (`@|\\  \\ '` = 'WHERE\\' DELETE') AND (`column` = '\\' some serious injection /  \\'' OR `column` = 'lol' ) ",
       );
     });
 
@@ -44,7 +44,7 @@ describe("DeleteBuilder", () => {
       });
 
       expect(sql).to.be.eql(
-        "DELETE * FROM `table` WHERE (`@|\\  \\ '` = 'WHERE\\' DELETE') AND (`column` = '\\' some serious injection /  \\'' ) LIMIT 5 ",
+        "DELETE FROM `table` WHERE (`@|\\  \\ '` = 'WHERE\\' DELETE') AND (`column` = '\\' some serious injection /  \\'' ) LIMIT 5 ",
       );
     });
   });

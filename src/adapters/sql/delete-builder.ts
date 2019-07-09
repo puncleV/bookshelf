@@ -4,7 +4,7 @@ import {IQueryParams} from "./types";
 // todo maybe add some integration tests
 export class DeleteBuilder extends AbstractBuilder {
   public build(params: IQueryParams) {
-    let sql = `DELETE ${this.stringifyColumns(params.columns) || '*'} FROM ${this.escapeId(params.tableName)} `;
+    let sql = `DELETE FROM ${this.escapeId(params.tableName)} `;
 
     if (params.query == null) {
       return sql;
