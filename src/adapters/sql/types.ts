@@ -16,11 +16,24 @@ export enum ISqlOperation {
 }
 export type IWhere = Record<string, any | any[]>
 
+export enum SortOrder {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
+
+export interface IQuery {
+  where?: IWhere;
+  limit?: number;
+  skip?: number;
+  orderBy?: string;
+  order?: SortOrder;
+}
+
 export interface IQueryParams {
    columns?: string[];
    fields?: Record<string, any>;
    tableName: string;
-   where: IWhere;
+   query?: IQuery;
 }
 
 export interface IBuilder {

@@ -1,14 +1,15 @@
-import _ from "lodash";
+import SqlString from "sqlstring";
 import {IBuilder, IQueryParams, IWhere} from "./types";
 
 export abstract class AbstractBuilder implements IBuilder {
   public abstract build(params: IQueryParams): string;
+
   protected getColumns(columns: IQueryParams["columns"]): string {
     if (columns == null || columns.length === 0) {
       return "";
     }
 
-    return columns.map((column) => `\`${column}\``).join(", ");
+    return columns.map((column) => this.escapeId(column)).join(", ");
   }
 
   protected where(where?: IWhere) {
@@ -18,7 +19,7 @@ export abstract class AbstractBuilder implements IBuilder {
 
     return (
       Object.entries(where).reduce((acc, [key, value]) => {
-        if (acc !== " ") {
+        if (acc !== "WHERE ") {
           acc += ") AND (";
         } else {
           acc += "(";
@@ -32,25 +33,29 @@ export abstract class AbstractBuilder implements IBuilder {
         if (Array.isArray(value)) {
           keyValues.push(
             ...value.map((fieldValue) => ({
-              key: this.screenValues(key),
-              value: this.screenValues(fieldValue),
+              key: this.escapeId(key),
+              value: this.escapeValue(fieldValue),
             })),
           );
         } else {
           keyValues.push({
-            key: this.screenValues(key),
-            value: this.screenValues(value),
+            key: this.escapeId(key),
+            value: this.escapeValue(value),
           });
         }
 
-        acc += keyValues.map(({key, value}) => `'${key}' = '${value}'`).join(" OR ");
+        acc += keyValues.map(({key, value}) => `${key} = ${value}`).join(" OR ");
 
         return acc;
-      }, " ") + " )"
+      }, "WHERE ") + " )"
     );
   }
 
-  protected screenValues(value: string): string {
-    return value.replace("'", "\\'");
+  protected escapeValue (value: string | number): string {
+    return SqlString.escape(value);
+  }
+
+  protected escapeId (value: string): string {
+    return SqlString.escapeId(value);
   }
 }
