@@ -1,12 +1,19 @@
 import casual from "casual";
 import {expect, request} from "chai";
+import _ from "lodash";
 
 import {server} from "../../../src/api";
 import {createBookRepository} from "../component-creators";
 
 describe("BookController", () => {
+  let bookRepo: any;
+
+  before(() => {
+    bookRepo = createBookRepository();
+  });
+
   describe("create", () => {
-    it("create by customerId", async () => {
+    it("create book", async () => {
       const bookToCreate = {
         title: casual.word,
         issueDate: new Date(casual.date()).toISOString(),
@@ -25,6 +32,33 @@ describe("BookController", () => {
     });
   });
 
+  describe("update", () => {
+    it("update book", async () => {
+      const bookToCreate = {
+        title: casual.word,
+        issueDate: new Date(casual.date()).toISOString().replace(/T.*/, ""),
+        author: casual.first_name,
+        description: casual.string,
+        image: casual.uuid,
+      };
+
+      const createdBook = await bookRepo.create(bookToCreate);
+
+      const fieldToUpdate = casual.random_key(_.omit(bookToCreate, ["issueDate", "image"]));
+      const valueToUpdate = casual.word;
+
+      await request(server)
+        .put(`/books/${createdBook.id}`)
+        .send({
+          [fieldToUpdate]: valueToUpdate
+        });
+
+      const updatedBook = await bookRepo.findById(createdBook.id);
+
+      expect(updatedBook[fieldToUpdate]).to.be.eql(valueToUpdate);
+    });
+  });
+
   describe("find", () => {
     const createBookStub = () => ({
       title: casual.word,
@@ -35,7 +69,6 @@ describe("BookController", () => {
     });
 
     it("find all books", async () => {
-      const bookRepo = createBookRepository();
       const books = [];
 
       for (let i = 0; i < 5; i++) {
@@ -60,6 +93,7 @@ describe("BookController", () => {
           .sort((a: any, b: any) => (a.author < b.author ? 1 : -1)),
       ).to.deep.include.members(books.sort((a: any, b: any) => (a.author < b.author ? 1 : -1)));
     });
+
     it("find all with skip and limit", async () => {
       const bookRepo = createBookRepository();
       const books = [];
@@ -84,6 +118,7 @@ describe("BookController", () => {
       }))[0];
       expect(books.some((createdBook) => createdBook.image === book.image)).to.be.true;
     });
+
     it("find by field", async () => {
       const bookRepo = createBookRepository();
       const books = [];
