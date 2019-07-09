@@ -20,7 +20,7 @@ describe("BaseRepository", () => {
     ...overrides
   });
 
-  describe("integration", () => {
+  describe.only("integration", () => {
     let sqlConnection: sql.SqlConnection;
     let baseRepository: repositories.BaseRepository<ITestType, ITestType>;
     let tableName: string ;
@@ -36,7 +36,11 @@ describe("BaseRepository", () => {
       });
 
       baseRepository = new repositories.BaseRepository<ITestType, ITestType>({
-        sqlConnection
+        sqlConnection,
+        deleteBuilder: new sql.DeleteBuilder(),
+        insertBuilder: new sql.InsertBuilder(),
+        selectBuilder: new sql.SelectBuilder(),
+        updateBuilder: new sql.UpdateBuilder()
       }, {
         entity: tableName,
         mapToRawFields: new Map<keyof ITestType, keyof ITestType>([
@@ -183,7 +187,11 @@ describe("BaseRepository", () => {
 
     it("fields mapping", async () => {
       baseRepository = new repositories.BaseRepository<ITestType, ITestType>({
-        sqlConnection
+        sqlConnection,
+        deleteBuilder: new sql.DeleteBuilder(),
+        insertBuilder: new sql.InsertBuilder(),
+        selectBuilder: new sql.SelectBuilder(),
+        updateBuilder: new sql.UpdateBuilder()
       }, {
         entity: tableName,
         mapToRawFields: new Map<keyof ITestType, keyof ITestType>([

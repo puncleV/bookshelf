@@ -5,6 +5,10 @@ import * as types from "../types";
 
 export interface IBaseRepositoryDependencies {
   sqlConnection: sql.SqlConnection;
+  selectBuilder: sql.SelectBuilder;
+  insertBuilder: sql.InsertBuilder;
+  updateBuilder: sql.UpdateBuilder;
+  deleteBuilder: sql.DeleteBuilder;
 }
 
 // T - internal type, Q - type as it is in database
@@ -18,9 +22,18 @@ export class BaseRepository<T extends {id: string}, Q> {
   protected entity: string;
   protected mapToRawFields: Map<keyof T, keyof Q>;
   protected mapToInternalFields: Map<keyof Q, keyof T>;
+  protected selectBuilder: sql.SelectBuilder;
+  protected insertBuilder: sql.InsertBuilder;
+  protected updateBuilder: sql.UpdateBuilder;
+  protected deleteBuilder: sql.DeleteBuilder;
 
   constructor(dependencies: IBaseRepositoryDependencies, params: IBaseRepositoryParams<T, Q>) {
     this.sqlConnection = dependencies.sqlConnection;
+    this.selectBuilder = dependencies.selectBuilder;
+    this.insertBuilder = dependencies.insertBuilder;
+    this.updateBuilder = dependencies.updateBuilder;
+    this.deleteBuilder = dependencies.selectBuilder;
+
     this.entity = params.entity;
     this.mapToRawFields = params.mapToRawFields;
     this.mapToInternalFields = Array.from(params.mapToRawFields.entries()).reduce(
@@ -35,7 +48,10 @@ export class BaseRepository<T extends {id: string}, Q> {
   public async create(entity: types.Omit<T, "id">): Promise<T> {
     const id = uuid.v4();
 
-    await this.sqlConnection.connection(this.entity).insert(this.getRawEntityFromInternal({...entity, id} as T));
+    await this.sqlConnection.connection.raw(this.insertBuilder.build({
+      fields: {...entity, id},
+      tableName: this.entity,
+    }));
 
     return await this.findById(id) as T;
   }
