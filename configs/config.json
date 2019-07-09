@@ -1,7 +1,7 @@
 {
   "database": {
     "client": "mysql",
-    "host": "localhost",
+    "host": "database",
     "user": "root",
     "password": "supersecret",
     "database": "bookshelf",
