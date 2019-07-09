@@ -1,3 +1,3 @@
 export const routes = {
-  "GET /books": "HelloController#get",
+  "POST /books": "BookController#create",
 };

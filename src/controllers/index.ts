@@ -1,1 +1,1 @@
-export * from "./hello-controller";
+export * from "./book-controller";
