@@ -1,4 +1,5 @@
 import uuid from "uuid";
+import _ from "lodash";
 
 import {sql} from "../adapters";
 import * as types from "../types";
@@ -48,27 +49,41 @@ export class BaseRepository<T extends {id: string}, Q> {
   public async create(entity: types.Omit<T, "id">): Promise<T> {
     const id = uuid.v4();
 
-    await this.sqlConnection.connection.raw(this.insertBuilder.build({
-      fields: {...entity, id},
-      tableName: this.entity,
-    }));
+    await this.sqlConnection.connection.raw(
+      this.insertBuilder.build({
+        fields: this.getRawEntityFromInternal({...entity, id} as T),
+        tableName: this.entity,
+      }),
+    );
 
-    return await this.findById(id) as T;
+    return (await this.findById(id)) as T;
   }
 
   public async find(entity: Partial<T>): Promise<T | null> {
-    return this.getInternalEntityFromRaw(
-      await this.sqlConnection
-        .connection(this.entity)
-        .where(this.getRawEntityFromInternal(entity))
-        .first(),
-    ) as T;
+    const rawData = await this.sqlConnection.connection.raw(
+      this.selectBuilder.build({
+        tableName: this.entity,
+        query: {
+          where: this.getRawEntityFromInternal(entity),
+          limit: 1,
+        },
+      }),
+    );
+
+    return this.getInternalEntityFromRaw(_.get(rawData, "[0][0]", null) as Q) as T;
   }
 
   public async findMany(entity: Partial<T>): Promise<T[]> {
-    return (await this.sqlConnection.connection(this.entity).where(this.getRawEntityFromInternal(entity))).map(
-      (rawEntity) => this.getInternalEntityFromRaw(rawEntity) as T,
+    const rawData = await this.sqlConnection.connection.raw(
+      this.selectBuilder.build({
+        tableName: this.entity,
+        query: {
+          where: this.getRawEntityFromInternal(entity),
+        },
+      }),
     );
+
+    return _.get(rawData, "[0]", []).map((rawRow: Q) => this.getInternalEntityFromRaw(rawRow));
   }
 
   public async update(id: string, entity: Partial<types.Omit<T, "id">>) {
@@ -81,26 +96,21 @@ export class BaseRepository<T extends {id: string}, Q> {
   }
 
   public async findById(id: string): Promise<T | null> {
-    return this.getInternalEntityFromRaw(
-      await this.sqlConnection
-        .connection(this.entity)
-        .where({id})
-        .first(),
-    ) as T;
+    return this.find({id} as Partial<T>);
   }
 
-  public async deleteById (id: string): Promise<void> {
+  public async deleteById(id: string): Promise<void> {
     return await this.sqlConnection
       .connection(this.entity)
       .where({id})
-      .del()
+      .del();
   }
 
   public async delete(entity: Partial<T>): Promise<void> {
     return await this.sqlConnection
-        .connection(this.entity)
-        .where(this.getRawEntityFromInternal(entity))
-        .del()
+      .connection(this.entity)
+      .where(this.getRawEntityFromInternal(entity))
+      .del();
   }
 
   // todo this is not the best place for this generic method
@@ -123,7 +133,7 @@ export class BaseRepository<T extends {id: string}, Q> {
 
   protected getInternalEntityFromRaw(entity: Partial<Q> | Q): Partial<T> | T | null {
     if (entity == null) {
-      return null
+      return null;
     }
 
     return this.changeKeysByMap(entity, this.mapToInternalFields);
