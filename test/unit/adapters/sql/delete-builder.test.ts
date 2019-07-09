@@ -1,7 +1,7 @@
 import {expect} from "chai";
 import {sql} from "../../../../src/adapters";
 
-describe.only("DeleteBuilder", () => {
+describe("DeleteBuilder", () => {
   let selectBuilder: sql.DeleteBuilder;
 
   beforeEach(() => {
