@@ -1,10 +1,10 @@
-import {IQueryParams, SortOrder} from "./types";
 import {AbstractBuilder} from "./abstract-builder";
+import {IQueryParams, SortOrder} from "./types";
 
 // todo maybe add some integration tests
 export class SelectBuilder extends AbstractBuilder {
   public build(params: IQueryParams) {
-    let sql = `SELECT ${this.getColumns(params.columns) || '*'} FROM ${this.escapeId(params.tableName)} `;
+    let sql = `SELECT ${this.stringifyColumns(params.columns) || '*'} FROM ${this.escapeId(params.tableName)} `;
 
     if (params.query == null) {
       return sql;

@@ -4,12 +4,12 @@ import {IBuilder, IQueryParams, IWhere} from "./types";
 export abstract class AbstractBuilder implements IBuilder {
   public abstract build(params: IQueryParams): string;
 
-  protected getColumns(columns: IQueryParams["columns"]): string {
+  protected stringifyColumns(columns: IQueryParams["columns"]): string {
     if (columns == null || columns.length === 0) {
       return "";
     }
 
-    return columns.map((column) => this.escapeId(column)).join(", ");
+    return this.escapeId(columns);
   }
 
   protected where(where?: IWhere) {
@@ -57,7 +57,7 @@ export abstract class AbstractBuilder implements IBuilder {
     return SqlString.escape(value);
   }
 
-  protected escapeId (value: string): string {
+  protected escapeId (value: string | string[]): string {
     return SqlString.escapeId(value);
   }
 }
