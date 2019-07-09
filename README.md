@@ -1,11 +1,7 @@
 # bookshelf
-Sample rest API (pizza ordering service)
+Sample rest API (books service)
 
-It's suppose to be public api, so there is not methods that could add pizzas or something like that. 
-
-It's not done, but have examples of my style testing, layering, etc. 
-
-Have no more time to complete/refactor it.
+point was to not use ORM for database communication 
 
 To start app:
 ```docker-compose up```
