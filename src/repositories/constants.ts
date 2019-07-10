@@ -3,7 +3,7 @@ import {
   IRawBook,
 } from "./types";
 
-export const PizzaFieldsMap = new Map<keyof IBook, keyof IRawBook>([
+export const BookFieldsMap = new Map<keyof IBook, keyof IRawBook>([
   ["id", "id"],
   ["title", "title"],
   ["issueDate", "issue_date"],
